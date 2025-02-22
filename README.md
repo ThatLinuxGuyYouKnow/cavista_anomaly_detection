@@ -45,7 +45,7 @@ The base URL for all API endpoints is:
     }
     ```
 
-> curl -X POST https://cavista-anomaly-detection.onrender.com/signup \
+curl -X POST https://cavista-anomaly-detection.onrender.com/signup \
  -H "Content-Type: application/json" \
 -d '{
   "name": "John Doe",
@@ -156,8 +156,8 @@ The base URL for all API endpoints is:
   ```
 - **Response:**
   - **Success (200):**
-    ```json
 
+```json
     {
   "bpm": [
     {
@@ -305,10 +305,9 @@ The base URL for all API endpoints is:
       "time": "2025-02-22T22:09:42.083911"
     }
   ]
-
-
     }
     ```
+
   - **Error (400 or 500):**
     ```json
     {
