@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from datetime import datetime
+from flask_cors import CORS
 import numpy as np
 from collections import deque
 from alerts.create_alert import getAlerts
@@ -43,7 +44,18 @@ class CorrelationMonitor:
         
         return is_anomalous, correlation
 
+ 
+
 app = Flask(__name__)
+# Enable CORS for all routes
+CORS(app, resources={
+    r"/*": {
+        "origins": "*",  # Allow all origins
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Allow all methods
+        "allow_headers": ["Content-Type", "Authorization"]  # Allow these headers
+    }
+})
+
 monitor = CorrelationMonitor()
 
 ## Mobile route, disregard for front end
