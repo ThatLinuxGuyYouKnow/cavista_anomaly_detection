@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from datetime import datetime
 import numpy as np
 from collections import deque
+from auth.signin import signin
+from auth.signup import sign_up_new_user
 
 class CorrelationMonitor:
     def __init__(self, window_size=10, correlation_threshold=0.5):
@@ -74,6 +76,7 @@ def monitor_vitals():
             is_data_anomalous = 'true'
         else:
             is_data_anomalous="false" 
+        
         # Prepare response
         response = {
             'timestamp': datetime.now().isoformat(),
@@ -99,6 +102,59 @@ def monitor_vitals():
         return jsonify({
             'error': f'Internal server error: {str(e)}'
         }), 500
+    
+@app.route("/signup", methods=['POST'])
+def signup():
+    try:
+        data = request.get_json()
+        
+        # Validate request data
+        if not data or 'name' not in data or 'email' not in data or 'password' not in data or 'phcp_name' not in data or 'phcp_number' not in data or 'phcp_email' not in data:
+            return jsonify({'error': 'Missing required data. Please provide name, email, password, phcp_name, phcp_number, and phcp_email'}), 400
+        
+        user_name = data['name']
+        user_email = data['email']
+        password = data['password']
+        primary_health_care_provider_name = data['phcp_name']
+        primary_health_care_provider_number = data['phcp_number']  # Fixed typo here
+        primary_health_care_provider_email = data['phcp_email']
+        
+        # Call the sign_up_new_user function
+        response = sign_up_new_user(
+            password=password,
+            username=user_name,
+            email=user_email,
+            primary_health_care_contact_email=primary_health_care_provider_email,
+            primary_health_care_provider_name=primary_health_care_provider_name,
+            primary_health_care_contact_number=primary_health_care_provider_number
+        )
+        
+        # Return the response from sign_up_new_user
+        return response
+
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
+@app.route("/signin", methods=['POST'])
+def sign_in():
+    try:
+        data = request.get_json()
+        
+        # Validate request data
+        if not data or 'email' not in data or 'password' not in data:
+            return jsonify({'error': 'Missing required data. Please provide email and password'}), 400
+        
+        email = data['email']
+        password = data['password']
+        
+        # Call the signin function
+        response = signin(password=password, email=email)
+        
+        # Return the response from signin
+        return response
+
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
