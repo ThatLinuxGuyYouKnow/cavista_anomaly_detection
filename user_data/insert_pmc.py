@@ -19,7 +19,7 @@ supabase: Client = create_client(supabase_url=url, supabase_key=key)
 def insertPMC_2(userID, PMC_name, PMC_email, PMC_phone_number):
     try:
         # Insert the secondary healthcare provider information into the 'users' table
-        insert_response = supabase.table('users').update({
+        insert_response = supabase.table('users').insert({
             "primary_health_care_2_email": PMC_email,
             "primary_health_care_2_name": PMC_name,
             "primary_health_care_2_number": PMC_phone_number

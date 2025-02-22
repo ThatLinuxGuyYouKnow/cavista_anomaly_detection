@@ -116,6 +116,7 @@ def signup():
         
         user_name = data['name']
         user_email = data['email']
+        age = data['age']
         password = data['password']
         primary_health_care_provider_name = data['pmc_name']
         primary_health_care_provider_number = data['pmc_number']  
@@ -124,6 +125,7 @@ def signup():
         # Call the sign_up_new_user function
         response = sign_up_new_user(
             password=password,
+            age=age,
             username=user_name,
             email=user_email,
             primary_health_care_contact_email=primary_health_care_provider_email,
