@@ -57,7 +57,7 @@ The base URL for all API endpoints is:
   "pmc_email": "dr.smith@example.com"
 }'
 ---
-
+![example](image.png)
 ### **Sign In**
 - **Endpoint:** `/signin`
 - **Method:** `POST`

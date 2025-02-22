@@ -199,7 +199,7 @@ def insert_pmc_2():
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
 # Get and Push Bio Data
-@app.route("/get_step_data", methods=['POST'])
+@app.route("/get_step_data", methods=['GET'])
 def getSteps():
     try:
         data = request.get_json()
@@ -221,7 +221,7 @@ def record_data():
     except Exception as e:
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
-@app.route("/get_all_bpm", methods=['POST'])
+@app.route("/get_all_bpm", methods=['GET'])
 def get_all_bpm():
     try:
         data = request.get_json()
@@ -231,7 +231,7 @@ def get_all_bpm():
     except Exception as e:
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
-@app.route("/get_beats_10", methods=['POST'])
+@app.route("/get_beats_10", methods=['GET'])
 def get_last_10():
     try:
         data = request.get_json()
