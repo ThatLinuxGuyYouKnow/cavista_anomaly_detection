@@ -3,7 +3,7 @@ import supabase
 from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
-
+"This route for the which app to push its data to the db"
 # Load environment variables from .env file
 load_dotenv()
 

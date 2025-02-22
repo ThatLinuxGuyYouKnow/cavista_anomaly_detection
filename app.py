@@ -4,8 +4,10 @@ import numpy as np
 from collections import deque
 from auth.signin import signin
 from auth.signup import sign_up_new_user
-##
+from bio_data.get_bpm import getAllBpm, getLast10bpm
 from user_data.update_pmc import updatePMC_1, updatePMC_2
+from bio_data.record_bpm import record_bio_data
+from bio_data.get_step_data import getStepPerMinute
 
 class CorrelationMonitor:
     def __init__(self, window_size=10, correlation_threshold=0.5):
@@ -43,6 +45,7 @@ class CorrelationMonitor:
 app = Flask(__name__)
 monitor = CorrelationMonitor()
 
+## Mobile route, disregard for front end
 @app.route("/monitor", methods=['POST'])
 def monitor_vitals():
     try:
@@ -73,16 +76,12 @@ def monitor_vitals():
         
         # Check for anomalies
         is_anomalous, correlation = monitor.detect_anomaly()
-        is_data_anomalous: str
-        if is_anomalous:
-            is_data_anomalous = 'true'
-        else:
-            is_data_anomalous="false" 
+        is_data_anomalous = 'true' if is_anomalous else 'false'
         
         # Prepare response
         response = {
             'timestamp': datetime.now().isoformat(),
-            'is_anomalous':  is_data_anomalous,
+            'is_anomalous': is_data_anomalous,
             'correlation': float(correlation),
             'current_readings': {
                 'heart_rate': list(monitor.heart_rates)[-1] if monitor.heart_rates else None,
@@ -111,8 +110,8 @@ def signup():
         data = request.get_json()
         
         # Validate request data
-        if not data or 'name' not in data or 'email' not in data or 'password' not in data or 'phcp_name' not in data or 'phcp_number' not in data or 'phcp_email' not in data:
-            return jsonify({'error': 'Missing required data. Please provide name, email, password, phcp_name, phcp_number, and phcp_email'}), 400
+        if not data or 'name' not in data or 'email' not in data or 'password' not in data or 'pmc_name' not in data or 'pmc_number' not in data or 'pmc_email' not in data:
+            return jsonify({'error': 'Missing required data. Please provide name, email, password, pmc_name, pmc_number, and pmc_email'}), 400
         
         user_name = data['name']
         user_email = data['email']
@@ -133,7 +132,6 @@ def signup():
         
         # Return the response from sign_up_new_user
         return response
-
     except Exception as e:
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
@@ -154,35 +152,91 @@ def sign_in():
         
         # Return the response from signin
         return response
-
     except Exception as e:
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
-" Data Routes"
-
-@app.route("/update_pmc_1")
+# Data Routes
+@app.route("/update_pmc_1", methods=['POST'])
 def update_pmc_1():
-    data = request.get_data()
-    pmc_name = data['pmc_name']
-    pmc_email = data['pmc_email']
-    pmc_number = data['pmc_number']
-    response = updatePMC_1(newPMC_1_name=pmc_name, newPMC_1_email=pmc_email, newPMC_1_number=pmc_number)
+    try:
+        data = request.get_json()
+        pmc_name = data['pmc_name']
+        pmc_email = data['pmc_email']
+        pmc_number = data['pmc_number']
+        userID = data['userID']
+        response = updatePMC_1(newPMC_1_name=pmc_name, newPMC_1_email=pmc_email, userID=userID)
+        return response
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
-@app.route("/update_pmc_2")
+@app.route("/update_pmc_2", methods=['POST'])
 def update_pmc_2():
-    data = request.get_data()
-    pmc_name = data['pmc_name']
-    pmc_email = data['pmc_email']
-    pmc_number = data['pmc_number']
-    response = updatePMC_2(newPMC_2_name=pmc_name, newPMC_2_email=pmc_email, newPMC_2_number=pmc_number)
-    return response
-@app.route("/insert_pmc_2")
+    try:
+        data = request.get_json()
+        pmc_name = data['pmc_name']
+        pmc_email = data['pmc_email']
+        pmc_number = data['pmc_number']
+        userID = data['userID']
+        response = updatePMC_2(newPMC_2_name=pmc_name, newPMC_2_email=pmc_email, userID=userID)
+        return response
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
+@app.route("/insert_pmc_2", methods=['POST'])
 def insert_pmc_2():
-    data = request.get_data()
-    pmc_name = data['pmc_name']
-    pmc_email = data['pmc_email']
-    pmc_number = data['pmc_number']
-    response = updatePMC_2(newPMC_2_name=pmc_name, newPMC_2_email=pmc_email, newPMC_2_number=pmc_number)
-    return response
+    try:
+        data = request.get_json()
+        pmc_name = data['pmc_name']
+        pmc_email = data['pmc_email']
+        pmc_number = data['pmc_number']
+        userID = data['userID']
+        response = updatePMC_2(newPMC_2_name=pmc_name, newPMC_2_email=pmc_email, userID=userID)
+        return response
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
+# Get and Push Bio Data
+@app.route("/get_step_data", methods=['POST'])
+def getSteps():
+    try:
+        data = request.get_json()
+        userID = data['userID']
+        response = getStepPerMinute(userID=userID)
+        return response
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
+@app.route("/record_bio_data", methods=['POST'])
+def record_data():
+    try:
+        data = request.get_json()
+        bpm_list = data['bpm_list']
+        step_list = data['step_list']
+        userID = data['userID']
+        response = record_bio_data(bpm_data_list=bpm_list, step_count=step_list, userID=userID)
+        return response
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
+@app.route("/get_all_bpm", methods=['POST'])
+def get_all_bpm():
+    try:
+        data = request.get_json()
+        userID = data['userID']
+        response = getAllBpm(userID=userID)
+        return response
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
+@app.route("/get_beats_10", methods=['POST'])
+def get_last_10():
+    try:
+        data = request.get_json()
+        userID = data['userID']
+        response = getLast10bpm(userID=userID)
+        return response
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
 if __name__ == "__main__":
     app.run(debug=True)
