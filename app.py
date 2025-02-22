@@ -4,6 +4,8 @@ import numpy as np
 from collections import deque
 from auth.signin import signin
 from auth.signup import sign_up_new_user
+##
+from user_data.update_pmc import updatePMC_1, updatePMC_2
 
 class CorrelationMonitor:
     def __init__(self, window_size=10, correlation_threshold=0.5):
@@ -115,9 +117,9 @@ def signup():
         user_name = data['name']
         user_email = data['email']
         password = data['password']
-        primary_health_care_provider_name = data['phcp_name']
-        primary_health_care_provider_number = data['phcp_number']  # Fixed typo here
-        primary_health_care_provider_email = data['phcp_email']
+        primary_health_care_provider_name = data['pmc_name']
+        primary_health_care_provider_number = data['pmc_number']  
+        primary_health_care_provider_email = data['pmc_email']
         
         # Call the sign_up_new_user function
         response = sign_up_new_user(
@@ -156,5 +158,31 @@ def sign_in():
     except Exception as e:
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
 
+" Data Routes"
+
+@app.route("/update_pmc_1")
+def update_pmc_1():
+    data = request.get_data()
+    pmc_name = data['pmc_name']
+    pmc_email = data['pmc_email']
+    pmc_number = data['pmc_number']
+    response = updatePMC_1(newPMC_1_name=pmc_name, newPMC_1_email=pmc_email, newPMC_1_number=pmc_number)
+
+@app.route("/update_pmc_2")
+def update_pmc_2():
+    data = request.get_data()
+    pmc_name = data['pmc_name']
+    pmc_email = data['pmc_email']
+    pmc_number = data['pmc_number']
+    response = updatePMC_2(newPMC_2_name=pmc_name, newPMC_2_email=pmc_email, newPMC_2_number=pmc_number)
+    return response
+@app.route("/insert_pmc_2")
+def insert_pmc_2():
+    data = request.get_data()
+    pmc_name = data['pmc_name']
+    pmc_email = data['pmc_email']
+    pmc_number = data['pmc_number']
+    response = updatePMC_2(newPMC_2_name=pmc_name, newPMC_2_email=pmc_email, newPMC_2_number=pmc_number)
+    return response
 if __name__ == "__main__":
     app.run(debug=True)
