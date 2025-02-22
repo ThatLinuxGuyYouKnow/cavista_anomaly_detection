@@ -28,25 +28,20 @@ def getStepPerMinute(userID):
             # Check if there are any steps recorded
             if len(last_10_steps) == 0:
                 return jsonify({'error': "No step data available"}), 400
-                
-            # Convert strings to integers before summing
-            last_10_steps_int = [int(step) for step in last_10_steps]
-            
+
+            try:
+                # Convert all step values to integers
+                last_10_steps = [int(step) for step in last_10_steps]
+            except ValueError as e:
+                return jsonify({'error': f"Invalid step data: {str(e)}"}), 400
+
             # Calculate the average steps per minute
-            total_steps = sum(last_10_steps_int)
-            average_steps_per_minute = total_steps / len(last_10_steps_int)
-            
-            return jsonify({
-                'average_steps_per_minute': average_steps_per_minute,
-                'total_steps': total_steps,
-                'number_of_readings': len(last_10_steps_int)
-            }), 200
+            total_steps = sum(last_10_steps)
+            average_steps_per_minute = total_steps / len(last_10_steps)
+            return jsonify({'average_steps_per_minute': average_steps_per_minute}), 200
         else:
-            return jsonify({'error': "User has no step data"}), 400
-            
-    except ValueError as e:
-        # Handle conversion errors
-        return jsonify({'error': f"Invalid step data format: {str(e)}"}), 400
+            return jsonify({'error': "No data found for the user"}), 404
+
     except Exception as e:
         # Handle any other errors
         return jsonify({'error': str(e)}), 500
