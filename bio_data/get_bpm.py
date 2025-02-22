@@ -18,35 +18,29 @@ supabase: Client = create_client(supabase_url=url, supabase_key=key)
 
 def getAllBpm(userID):
     try:
-        # Fetch all BPM data for the user
+        # Fetch BPM data for the user
         response = supabase.table('bio_data').select('beats').eq('user_id', userID).execute()
         
-        if len(response.data) > 0:
-            # Extract the 'beats' field from the response
-            beats = response.data[0].get('beats', [])
-            return jsonify({'bpm': beats}), 200
+        if response.data:
+            beats_data = response.data[0].get('beats', {"beats": []})
+            return jsonify({'bpm': beats_data["beats"]}), 200
         else:
             return jsonify({'error': "User has no BPM data"}), 400
 
     except Exception as e:
-        # Handle any errors that occur during the process
         return jsonify({'error': str(e)}), 500
+
 
 def getLast10bpm(userID):
     try:
-        # Fetch all BPM data for the user
-        response = supabase.table('bio_data').select('beats').eq('user_id', userID).execute()
+        # Fetch last 10 BPM records for the user
+        response = supabase.table('bio_data').select('last_10_beats').eq('user_id', userID).execute()
         
-        if len(response.data) > 0:
-            # Extract the 'beats' field from the response
-            beats = response.data[0].get('beats', [])
-            
-            # Return the last 10 BPM readings safely
-            last_10_beats = beats[-10:] if len(beats) >= 10 else beats
+        if response.data:
+            last_10_beats = response.data[0].get('last_10_beats', [])
             return jsonify({'bpm': last_10_beats}), 200
         else:
             return jsonify({'error': "User has no BPM data"}), 400
 
     except Exception as e:
-        # Handle any errors that occur during the process
         return jsonify({'error': str(e)}), 500

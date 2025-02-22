@@ -17,7 +17,7 @@ if not url or not key:
 supabase: Client = create_client(supabase_url=url, supabase_key=key)
 
 def getStepPerMinute(userID):
- def getStepPerMinute(userID):
+ 
     try:
         response = supabase.table('bio_data').select('last_10_steps').eq('user_id', userID).execute()
         
