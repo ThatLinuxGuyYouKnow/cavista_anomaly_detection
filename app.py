@@ -164,7 +164,7 @@ def update_pmc_1():
         pmc_email = data['pmc_email']
         pmc_number = data['pmc_number']
         userID = data['userID']
-        response = updatePMC_1(newPMC_1_name=pmc_name, newPMC_1_email=pmc_email, userID=userID)
+        response = updatePMC_1(newPMC_1_name=pmc_name, newPMC_1_email=pmc_email, userID=userID,newPMC_1_number=pmc_number)
         return response
     except Exception as e:
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
@@ -177,7 +177,7 @@ def update_pmc_2():
         pmc_email = data['pmc_email']
         pmc_number = data['pmc_number']
         userID = data['userID']
-        response = updatePMC_2(newPMC_2_name=pmc_name, newPMC_2_email=pmc_email, userID=userID)
+        response = updatePMC_2(newPMC_2_name=pmc_name, newPMC_2_email=pmc_email, userID=userID,newPMC_1_number=pmc_number)
         return response
     except Exception as e:
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
@@ -190,7 +190,7 @@ def insert_pmc_2():
         pmc_email = data['pmc_email']
         pmc_number = data['pmc_number']
         userID = data['userID']
-        response = updatePMC_2(newPMC_2_name=pmc_name, newPMC_2_email=pmc_email, userID=userID)
+        response = updatePMC_2(newPMC_2_name=pmc_name, newPMC_2_email=pmc_email, userID=userID,newPMC_1_number=pmc_number)
         return response
     except Exception as e:
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
