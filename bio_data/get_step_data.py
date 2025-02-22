@@ -17,31 +17,26 @@ if not url or not key:
 supabase: Client = create_client(supabase_url=url, supabase_key=key)
 
 def getStepPerMinute(userID):
+ def getStepPerMinute(userID):
     try:
-        # Fetch the last 10 steps data for the user
         response = supabase.table('bio_data').select('last_10_steps').eq('user_id', userID).execute()
         
-        if len(response.data) > 0:
-            # Extract the 'last_10_steps' field from the response
+        if response.data:
+            # Extract JSONB array directly as Python list
             last_10_steps = response.data[0].get('last_10_steps', [])
             
-            # Check if there are any steps recorded
-            if len(last_10_steps) == 0:
+            if not last_10_steps:  # Check for empty array
                 return jsonify({'error': "No step data available"}), 400
 
-            try:
-                # Convert all step values to integers
-                last_10_steps = [int(step) for step in last_10_steps]
-            except ValueError as e:
-                return jsonify({'error': f"Invalid step data: {str(e)}"}), 400
-
-            # Calculate the average steps per minute
+            # Calculate average (no conversion needed if stored as numbers)
             total_steps = sum(last_10_steps)
-            average_steps_per_minute = total_steps / len(last_10_steps)
-            return jsonify({'average_steps_per_minute': average_steps_per_minute}), 200
-        else:
-            return jsonify({'error': "No data found for the user"}), 404
+            average = total_steps / len(last_10_steps)
+            return jsonify({'average_steps_per_minute': average}), 200
+            
+        return jsonify({'error': "User not found"}), 404
 
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
     except Exception as e:
         # Handle any other errors
         return jsonify({'error': str(e)}), 500

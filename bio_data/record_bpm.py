@@ -18,31 +18,32 @@ supabase: Client = create_client(supabase_url=url, supabase_key=key)
 
 def record_bio_data(bpm_data_list: list, step_count: list, userID: str):
     try:
-        # Fetch the current 'beats' data for the user
+        # Validate input data types
+        if not all(isinstance(x, (int, float)) for x in bpm_data_list + step_count):
+            return {'error': 'Non-numeric values detected in input data'}, 400
+
+        # Fetch existing beats
         response = supabase.table('bio_data').select('beats').eq('user_id', userID).execute()
-        
-        # Check if there is existing data for the user
-        total_beats = []
-        if response.data and len(response.data) > 0:
-            # If there's existing data, retrieve the 'beats' field
-            total_beats = response.data[0].get('beats', [])
-        
-        # Append the new bpm_data_list to the existing beats
+        total_beats = response.data[0].get('beats', []) if response.data else []
+
+        # Append new data
         total_beats.extend(bpm_data_list)
-        
-        # Insert or update biometric data into the 'bio_data' table
-        insert_response = supabase.table('bio_data').upsert({
+
+        # Update last 10 values from ACCUMULATED DATA (not just new batch)
+        upsert_data = {
             "user_id": userID,
-            "last_10_beats": bpm_data_list[-10:],  # Store only the last 10 readings
-            "last_10_steps": step_count[-10:],     # Store only the last 10 steps
-            "beats": total_beats                  # Store all historical beats
-        }).execute()
+            "last_10_beats": total_beats[-10:],  # Last 10 from total
+            "last_10_steps": step_count[-10:],   # Adjust if steps need accumulation
+            "beats": total_beats
+        }
+
+        # Upsert to Supabase
+        insert_response = supabase.table('bio_data').upsert(upsert_data).execute()
         
-        # Check if the insertion was successful
-        if insert_response.data:
-            return {'message': 'Biometric data recorded successfully'}, 200
-        else:
-            return {'error': 'Failed to record biometric data'}, 500
+        return {'message': 'Data recorded'}, 200 if insert_response.data else {'error': 'Insert failed'}, 500
+
+    except Exception as e:
+        return {'error': str(e)}, 500
 
     except Exception as e:
         # Handle any errors that occur during the process
