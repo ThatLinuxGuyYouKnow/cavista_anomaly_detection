@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from datetime import datetime
 import numpy as np
 from collections import deque
+from alerts.create_alert import getAlerts
 from auth.signin import signin
 from auth.signup import sign_up_new_user
 from bio_data.get_bpm import getAllBpm, getLast10bpm
@@ -237,6 +238,9 @@ def get_last_10():
         return response
     except Exception as e:
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
-
+app.route("/get_alerts", methods = ['GET'])
+def get_user_Alerts():
+    userID = request.get_data['userID']
+    getAlerts(userID=userID)
 if __name__ == "__main__":
     app.run(debug=True)
