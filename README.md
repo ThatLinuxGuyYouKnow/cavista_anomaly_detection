@@ -45,6 +45,17 @@ The base URL for all API endpoints is:
     }
     ```
 
+> curl -X POST https://cavista-anomaly-detection.onrender.com/signup \
+ -H "Content-Type: application/json" \
+-d '{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "password": "securepassword123",
+  "age": "25",
+  "pmc_name": "Dr. Smith",
+  "pmc_number": "1234567890",
+  "pmc_email": "dr.smith@example.com"
+}'
 ---
 
 ### **Sign In**
@@ -216,7 +227,7 @@ The base URL for all API endpoints is:
 
 ### **Get Alerts**
 - **Endpoint:** `/get_alerts`
-- **Method:** `POST`
+- **Method:** `GET`
 - **Description:** Retrieves all alerts for a specific user.
 - **Request Body (JSON):**
   ```json
