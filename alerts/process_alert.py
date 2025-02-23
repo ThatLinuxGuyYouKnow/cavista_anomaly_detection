@@ -78,7 +78,7 @@ def send_emergency_alert(location, userID, bpm):
         twilio_client = Client(account_sid, auth_token)
 
         twilio_client.messages.create(
-            to= "+234907905996",#+23480002255372",  
+            to= "+2349079005996",#+23480002255372",  
             from_="+12764962715",   
             body=message
         )
