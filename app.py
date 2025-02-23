@@ -3,7 +3,7 @@ from datetime import datetime
 from flask_cors import CORS
 import numpy as np
 from collections import deque
-from alerts.create_alert import getAlerts
+from alerts.create_alert import create_alert, getAlerts
 from auth.signin import signin
 from auth.signup import sign_up_new_user
 from bio_data.get_bpm import getAllBpm, getLast10bpm
@@ -161,6 +161,18 @@ def get_last_10():
         return response
     except Exception as e:
         return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+@app.route("/alert",methods=['POST'])
+def create_new_alert():
+    try:
+     data = request.get_json()
+     userID = data['userID']
+     bpm = data['bpm']
+     location= data['location']
+     response = create_alert(userID=userID, bpm=bpm, location=location)
+     return response
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
 app.route("/get_alerts", methods = ['POST'])
 def get_user_Alerts():
     userID = request.get_data['userID']
