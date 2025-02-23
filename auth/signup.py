@@ -57,7 +57,14 @@ def sign_up_new_user(email: str, password: str, username: str, age: str,
                     'message': 'User signed up and data saved successfully',
                     'user_id': user_id,
                     'username': username,
-                    'email': email
+                    'email': email,
+                    "data": {       "user_id": user_id,
+                "username": username,
+                "email": email,
+                "age": age,
+                "primary_health_care_provider_name": primary_health_care_provider_name,
+                "primary_health_care_contact_number": primary_health_care_contact_number,
+                "primary_health_care_contact_email": primary_health_care_contact_email}
                 }), 201
             else:
                 return jsonify({'error': 'Failed to save user data'}), 500
