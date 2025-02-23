@@ -30,15 +30,21 @@ def signin(email: str, password: str):
         # Get the user_id from the auth response
         user_id = response.user.id
 
-        # Fetch the user's username from the users table
+        # Fetch all user details from the users table
         try:
-            user_response = supabase.table("users").select("username").eq("user_id", user_id).execute()
+            user_response = supabase.table("users").select(
+                "username, age, primary_health_care_provider_name, "
+                "primary_health_care_contact_number, primary_health_care_contact_email"
+            ).eq("user_id", user_id).execute()
+
             if not user_response.data:
                 return jsonify({'error': 'User not found in database'}), 404
 
-            username = user_response.data[0]["username"]  # Fetch the username
+            # Extract user data from response
+            user_info = user_response.data[0]
+
         except Exception as e:
-            return jsonify({'error': f'Error fetching username: {str(e)}'}), 500
+            return jsonify({'error': f'Error fetching user details: {str(e)}'}), 500
 
         # Prepare session and user data
         session_data = {
@@ -52,7 +58,14 @@ def signin(email: str, password: str):
             'id': user_id,
             'email': response.user.email,
             'email_verified': response.user.email_confirmed_at is not None,
-            'username': username  # Include username in the response
+            'username': user_info["username"],
+            'data': {
+                'username': user_info["username"],
+                'age': user_info["age"],
+                'primary_health_care_provider_name': user_info["primary_health_care_provider_name"],
+                'primary_health_care_contact_number': user_info["primary_health_care_contact_number"],
+                'primary_health_care_contact_email': user_info["primary_health_care_contact_email"]
+            }
         }
 
         # Return success response
