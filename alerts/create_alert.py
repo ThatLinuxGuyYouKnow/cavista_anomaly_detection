@@ -5,6 +5,8 @@ import os
 from dotenv import load_dotenv
 import datetime
 
+from alerts.process_alert import send_emergency_alert
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -32,19 +34,22 @@ def getAlerts(userID):
         # Handle any errors that occur during the process
         return jsonify({'error': str(e)}), 500
 
-def create_alert(userID, bpm):
+def create_alert(userID, bpm, location):
     try:
         # Insert a new alert into the 'alerts' table
         current_time = datetime.datetime.utcnow().isoformat()  # Get current UTC time in ISO format
         insert_response = supabase.table('alerts').insert({
-            'userID': userID,
+            'user_id': userID,
             'bpm': bpm,
-            'time': current_time
+            'time': current_time,
+            "location":location
         }).execute()
         
         # Check if the insertion was successful
         if insert_response.data:
+            send_emergency_alert(location=location, userID=userID, bpm=bpm)
             return jsonify({'message': 'Alert created successfully'}), 200
+            
         else:
             return jsonify({'error': 'Failed to create alert'}), 500
 
